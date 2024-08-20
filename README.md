@@ -6,7 +6,11 @@ ERD_flipkart.png: It contains the ER Diagram for the codes.
 Report_flipkart.pdf: Project Report in pdf format
 
 REFERENCES
+
 Code Reference: codeacademy.com
+
 Github: https://github.com/harnalashok
+
 Google: https://www.flipkart.com/
+
 Other References: chatgpt
