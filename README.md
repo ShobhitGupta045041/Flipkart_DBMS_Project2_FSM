@@ -1,5 +1,5 @@
 # Flipkart_DBMS_Project2_FSM
-**Flipkart_code.txt: Contains the excecutable SQL code.
+*Flipkart_code.txt: Contains the excecutable SQL code.
 
 ERD_flipkart.png: It contains the ER Diagram for the codes.
 
