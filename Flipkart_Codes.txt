@@ -1,0 +1,255 @@
+-- Create database
+CREATE DATABASE flipkart;
+
+-- Use the created database
+USE flipkart;
+
+
+-- Create the Users table
+CREATE TABLE Users (
+    userid CHAR(3) PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    password VARCHAR(100),
+    address VARCHAR(255),
+    phonenumber VARCHAR(15)
+);
+
+
+-- Create the Categories table
+CREATE TABLE Categories (
+    categoryid CHAR(2) PRIMARY KEY,
+    categoryname VARCHAR(100)
+);
+
+
+-- Create the Products table
+CREATE TABLE Products (
+    productid CHAR(10) PRIMARY KEY,
+    productname VARCHAR(100),
+    price DECIMAL(10, 2),
+    categoryid CHAR(2),
+    productquantity INT,
+    FOREIGN KEY (categoryid) REFERENCES Categories(categoryid)
+);
+
+
+-- Create the Payment table
+CREATE TABLE Payment (
+    paymentid CHAR(4) PRIMARY KEY,
+    paymentdate DATE,
+    amount DECIMAL(10, 2),
+    paymentmethod VARCHAR(50)
+);
+
+
+-- Create the Orders table
+CREATE TABLE Orders (
+    orderid CHAR(4) PRIMARY KEY,
+    orderdate DATE,
+    userid CHAR(3),
+    totalamount DECIMAL(10, 2),
+    paymentid CHAR(4),
+    FOREIGN KEY (userid) REFERENCES Users(userid),
+    FOREIGN KEY (paymentid) REFERENCES Payment(paymentid)
+);
+
+
+-- Create the OrderDetails table
+CREATE TABLE OrderDetails (
+    orderid CHAR(4),
+    productid CHAR(10),
+    quantity INT NOT NULL,
+    PRIMARY KEY (orderid, productid),
+    FOREIGN KEY (orderid) REFERENCES Orders(orderid),
+    FOREIGN KEY (productid) REFERENCES Products(productid)
+);
+
+
+-- Insert data into the Users table
+INSERT INTO Users (userid, name, email, password, address, phonenumber) VALUES
+('001', 'John Doe', 'john.doe@example.com', 'password123', '123 Elm Street, Springfield', '555-1234'),
+('002', 'Jane Smith', 'jane.smith@example.com', 'mypassword', '456 Oak Avenue, Metropolis', '555-5678'),
+('003', 'Alice Johnson', 'alice.johnson@example.com', 'alicepass', '789 Pine Road, Gotham', '555-8765');
+
+-- Insert data into the Categories table
+INSERT INTO Categories (categoryid, categoryname) VALUES
+('C1', 'Electronics'),
+('C2', 'Clothing'),
+('C3', 'Home & Kitchen');
+
+-- Insert data into the Products table
+INSERT INTO Products (productid, productname, price, categoryid, productquantity) VALUES
+('PROD1', 'Smartphone', 299.99, 'C1', 50),
+('PROD2', 'Laptop', 999.99, 'C1', 20),
+('PROD3', 'T-Shirt', 19.99, 'C2', 100),
+('PROD4', 'Blender', 49.99, 'C3', 30);
+
+-- Insert data into the Payment table
+INSERT INTO Payment (paymentid, paymentdate, amount, paymentmethod) VALUES
+('PAY1', '2024-08-01', 299.99, 'Credit Card'),
+('PAY2', '2024-08-02', 999.99, 'PayPal'),
+('PAY3', '2024-08-03', 19.99, 'Debit Card');
+
+-- Insert data into the Orders table
+INSERT INTO Orders (orderid, orderdate, userid, totalamount, paymentid) VALUES
+('ORD1', '2024-08-01', '001', 299.99, 'PAY1'),
+('ORD2', '2024-08-02', '002', 999.99, 'PAY2'),
+('ORD3', '2024-08-03', '003', 19.99, 'PAY3');
+
+-- Insert data into the OrderDetails table
+INSERT INTO OrderDetails (orderid, productid, quantity) VALUES
+('ORD1', 'PROD4', 11),
+('ORD2', 'PROD3', 1),
+('ORD2', 'PROD2', 5),
+('ORD3', 'PROD1', 7);
+
+-- Data Access Language
+-- 1. User Management Department
+-- Select all user details
+SELECT userid, name, email, password, address, phonenumber 
+FROM Users;
+
+-- Insert a new user record
+INSERT INTO Users (userid, name, email, password, address, phonenumber)
+VALUES ('004', 'Bob Brown', 'bob.brown@example.com', 'securepass', '321 Birch Lane, Star City', '555-4321');
+
+-- Update user information
+UPDATE Users
+SET name = 'Robert Brown', email = 'robert.brown@example.com', phonenumber = '555-1235'
+WHERE userid = '004';
+
+-- Delete a user record
+DELETE FROM Users
+WHERE userid = '004';
+
+
+-- 2. Product Management Department
+-- Retrieve all category details
+SELECT * 
+FROM Categories;
+
+-- Fetch product details with their corresponding categories
+SELECT p.productid, p.productname, p.price, p.productquantity, c.categoryname
+FROM Products p
+JOIN Categories c ON p.categoryid = c.categoryid;
+
+-- Insert a new category
+INSERT INTO Categories (categoryid, categoryname)
+VALUES ('C4', 'Sports & Outdoors');
+
+-- Add a new product under a specific category
+INSERT INTO Products (productid, productname, price, categoryid, productquantity)
+VALUES ('PROD5', 'Running Shoes', 79.99, 'C4', 150);
+
+-- Update product price and quantity
+UPDATE Products
+SET price = 89.99, productquantity = 140
+WHERE productid = 'PROD5';
+
+-- Remove a product from the inventory
+DELETE FROM Products
+WHERE productid = 'PROD5';
+
+-- Change the name of a category
+UPDATE Categories
+SET categoryname = 'Outdoor & Sports Equipment'
+WHERE categoryid = 'C4';
+
+-- Remove a category (and ensure products under this category are handled separately)
+DELETE FROM Categories
+WHERE categoryid = 'C4';
+
+
+-- 3. Sales and Order Management Department
+-- Retrieve all orders with user IDs and total amounts
+SELECT orderid, orderdate, userid, totalamount
+FROM Orders;
+
+-- Fetch details of a specific order including product information
+SELECT o.orderid, o.orderdate, o.userid, o.totalamount, od.productid, p.productname, od.quantity
+FROM Orders o
+JOIN OrderDetails od ON o.orderid = od.orderid
+JOIN Products p ON od.productid = p.productid
+WHERE o.orderid = 'ORD1';
+
+-- Insert a new order record
+INSERT INTO Payment (paymentid,paymentdate,amount,paymentmethod) VALUES ('PAY4', '2024-08-04', 129.99, 'Credit Card');
+INSERT INTO Orders (ordered, orderdate, userid, totalpayment, paymentid) VALUES ('ORD4', '2024-08-04', 129.99, 'PAY4');
+Select * from Payment;
+select * from Orders;
+
+-- Add details for the newly created order
+INSERT INTO OrderDetails (orderid, productid, quantity)
+VALUES ('ORD4', 'PROD2', 2);
+
+-- Update the total amount of an existing order
+UPDATE Orders
+SET totalamount = 149.99
+WHERE orderid = 'ORD4';
+
+-- Remove an order and its associated details
+DELETE FROM OrderDetails
+WHERE orderid = 'ORD4';
+
+DELETE FROM Orders
+WHERE orderid = 'ORD4';
+
+-- Retrieve order details and associated products for all orders
+SELECT o.orderid, o.orderdate, o.userid, od.productid, p.productname, od.quantity
+FROM Orders o
+JOIN OrderDetails od ON o.orderid = od.orderid
+JOIN Products p ON od.productid = p.productid;
+
+
+-- 4. Logistics and Inventory Department
+-- Fetch details of products in a specific order to manage shipment
+SELECT od.orderid, od.productid, p.productname, od.quantity
+FROM OrderDetails od
+JOIN Products p ON od.productid = p.productid
+WHERE od.orderid = 'ORD2';
+
+-- Update product quantity after shipment
+UPDATE Products
+SET productquantity = productquantity - 5
+WHERE productid = 'PROD1';
+
+-- Retrieve total quantity of each product in all orders for inventory management
+SELECT p.productid, p.productname, SUM(od.quantity) AS total_ordered_quantity
+FROM OrderDetails od
+JOIN Products p ON od.productid = p.productid
+GROUP BY p.productid, p.productname;
+
+
+5. Analytics and Reporting Department
+-- Retrieve total sales amount by month
+SELECT DATE_FORMAT(orderdate, '%Y-%m') AS month, SUM(totalamount) AS total_sales
+FROM Orders
+GROUP BY month
+ORDER BY month;
+
+-- Analyze average product price and total quantity sold by category
+SELECT c.categoryname, AVG(p.price) AS average_price, SUM(od.quantity) AS total_quantity_sold
+FROM Products p
+JOIN Categories c ON p.categoryid = c.categoryid
+JOIN OrderDetails od ON p.productid = od.productid
+GROUP BY c.categoryname;
+
+-- Get the total number of orders and average order value per user
+SELECT u.userid, COUNT(o.orderid) AS total_orders, AVG(o.totalamount) AS average_order_value
+FROM Users u
+JOIN Orders o ON u.userid = o.userid
+GROUP BY u.userid;
+
+-- Fetch the top 5 products with the highest total sales
+SELECT p.productname, SUM(od.quantity * p.price) AS total_sales
+FROM Products p
+JOIN OrderDetails od ON p.productid = od.productid
+GROUP BY p.productname
+ORDER BY total_sales DESC
+LIMIT 5;
+
+-- Generate a report of payment methods used and their total amounts
+SELECT paymentmethod, SUM(amount) AS total_amount
+FROM Payment
+GROUP BY paymentmethod;
