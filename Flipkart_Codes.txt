@@ -1,0 +1,138 @@
+-- Create database
+CREATE DATABASE flipkart;
+
+-- Use the created database
+USE flipkart;
+
+
+-- Create the Users table
+CREATE TABLE Users (
+    userid CHAR(3) PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    password VARCHAR(100),
+    address VARCHAR(255),
+    phonenumber VARCHAR(15)
+);
+
+
+-- Create the Categories table
+CREATE TABLE Categories (
+    categoryid CHAR(2) PRIMARY KEY,
+    categoryname VARCHAR(100)
+);
+
+
+-- Create the Products table
+CREATE TABLE Products (
+    productid CHAR(10) PRIMARY KEY,
+    productname VARCHAR(100),
+    price DECIMAL(10, 2),
+    categoryid CHAR(2),
+    productquantity INT,
+    FOREIGN KEY (categoryid) REFERENCES Categories(categoryid)
+);
+
+
+-- Create the Payment table
+CREATE TABLE Payment (
+    paymentid CHAR(4) PRIMARY KEY,
+    paymentdate DATE,
+    amount DECIMAL(10, 2),
+    paymentmethod VARCHAR(50)
+);
+
+
+-- Create the Orders table
+CREATE TABLE Orders (
+    orderid CHAR(4) PRIMARY KEY,
+    orderdate DATE,
+    userid CHAR(3),
+    totalamount DECIMAL(10, 2),
+    paymentid CHAR(4),
+    FOREIGN KEY (userid) REFERENCES Users(userid),
+    FOREIGN KEY (paymentid) REFERENCES Payment(paymentid)
+);
+
+
+-- Create the OrderDetails table
+CREATE TABLE OrderDetails (
+    orderid CHAR(4),
+    productid CHAR(10),
+    quantity INT NOT NULL,
+    PRIMARY KEY (orderid, productid),
+    FOREIGN KEY (orderid) REFERENCES Orders(orderid),
+    FOREIGN KEY (productid) REFERENCES Products(productid)
+);
+
+
+-- Insert data into the Users table
+INSERT INTO Users (userid, name, email, password, address, phonenumber) VALUES
+('001', 'John Doe', 'john.doe@example.com', 'password123', '123 Elm Street, Springfield', '555-1234'),
+('002', 'Jane Smith', 'jane.smith@example.com', 'mypassword', '456 Oak Avenue, Metropolis', '555-5678'),
+('003', 'Alice Johnson', 'alice.johnson@example.com', 'alicepass', '789 Pine Road, Gotham', '555-8765');
+
+-- Insert data into the Categories table
+INSERT INTO Categories (categoryid, categoryname) VALUES
+('C1', 'Electronics'),
+('C2', 'Clothing'),
+('C3', 'Home & Kitchen');
+
+-- Insert data into the Products table
+INSERT INTO Products (productid, productname, price, categoryid, productquantity) VALUES
+('PROD1', 'Smartphone', 299.99, 'C1', 50),
+('PROD2', 'Laptop', 999.99, 'C1', 20),
+('PROD3', 'T-Shirt', 19.99, 'C2', 100),
+('PROD4', 'Blender', 49.99, 'C3', 30);
+
+-- Insert data into the Payment table
+INSERT INTO Payment (paymentid, paymentdate, amount, paymentmethod) VALUES
+('PAY1', '2024-08-01', 299.99, 'Credit Card'),
+('PAY2', '2024-08-02', 999.99, 'PayPal'),
+('PAY3', '2024-08-03', 19.99, 'Debit Card');
+
+-- Insert data into the Orders table
+INSERT INTO Orders (orderid, orderdate, userid, totalamount, paymentid) VALUES
+('ORD1', '2024-08-01', '001', 299.99, 'PAY1'),
+('ORD2', '2024-08-02', '002', 999.99, 'PAY2'),
+('ORD3', '2024-08-03', '003', 19.99, 'PAY3');
+
+-- Insert data into the OrderDetails table
+INSERT INTO OrderDetails (orderid, productid, quantity) VALUES
+('ORD1', 'PROD4', 11),
+('ORD2', 'PROD3', 1),
+('ORD2', 'PROD2', 5),
+('ORD3', 'PROD1', 7);
+
+-- Data Access Language
+--USER CREATION AND PRIVILEGE ASSIGNMENT
+
+-- Create User Management Department User
+CREATE USER 'user_mgmt'@'localhost' IDENTIFIED BY 'user_mgmt_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flipkart.Users TO 'user_mgmt'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Create Product Management User
+CREATE USER 'product_mgmt'@'localhost' IDENTIFIED BY 'product_mgmt_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flipkart.Categories TO 'product_mgmt'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flipkart.Products TO 'product_mgmt'@'localhost';
+FLUSH PRIVILEGES;
+
+
+-- Create Sales and Order Management User
+CREATE USER 'sales_mgmt'@'localhost' IDENTIFIED BY 'sales_mgmt_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flipkart.Orders TO 'sales_mgmt'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON flipkart.OrderDetails TO 'sales_mgmt'@'localhost';
+GRANT SELECT ON flipkart.Users(userid) TO 'sales_mgmt'@'localhost';  
+FLUSH PRIVILEGES;
+
+-- Create Logistics and Inventory User
+CREATE USER 'logistics_mgmt'@'localhost' IDENTIFIED BY 'logistics_mgmt_password';
+GRANT SELECT, UPDATE ON flipkart.Products TO 'logistics_mgmt'@'localhost';
+GRANT SELECT ON flipkart.OrderDetails TO 'logistics_mgmt'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Create Analyst User
+CREATE USER 'analyst'@'localhost' IDENTIFIED BY 'analyst_password';
+GRANT SELECT ON flipkart.* TO 'analyst'@'localhost';
+FLUSH PRIVILEGES;
